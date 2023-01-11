@@ -4,6 +4,7 @@ import Logo from '../../olx-logo.png';
 import {FirebaseContext} from '../../store/FirebaseContext'
 import './Login.css';
 
+
 function Login() {
   const [password,setPassword] = useState('');
   const [email , setEmail] = useState('')
@@ -11,9 +12,14 @@ function Login() {
   const history = useHistory()
   const handleLogin = ((e)=>{
     e.preventDefault()
+    console.log('stage try')
     firebase.auth().signInWithEmailAndPassword(email,password).then(()=>{
+      console.log('stage success')
+
       history.push('/')
     }).catch((error)=>{
+      console.log('stage failed')
+
       alert(error.message)
     })
 

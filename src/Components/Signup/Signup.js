@@ -3,88 +3,104 @@ import Logo from '../../olx-logo.png';
 import './Signup.css';
 import { FirebaseContext } from '../../store/FirebaseContext';
 import { useHistory ,Link} from 'react-router-dom';
+import { useForm } from 'react-hook-form';
+import { Form, Button } from 'semantic-ui-react';
 
 export default function Signup() {
 
-  const [username,setUsername] = useState('');
-  const [email,setEmail] = useState('');
-  const [phone,setPhone] = useState('');
-  const [password,setPassword] = useState('');
+
 
   const {firebase} = useContext(FirebaseContext)
   const history = useHistory()
-
-  const handleSubmit=(e)=>{
-    e.preventDefault()
-    firebase.auth().createUserWithEmailAndPassword(email,password).then((result)=>{
-      result.user.updateProfile({displayName:username}).then(()=>{
+  const { register, handleSubmit, formState: { errors } } = useForm();
+  const onSubmit =(data)=>{
+    console.log(data);
+    firebase.auth().createUserWithEmailAndPassword(data.email,data.passWord).then((result)=>{
+      result.user.updateProfile({displayName:data.name}).then(()=>{
         firebase.firestore().collection('users').add({
           id:result.user.uid,
-          username:username,
-          phone:phone
+          username:data.name,
+          phone:data.phone
         }).then(()=>{
           history.push('/login')
         })
       })
     })
-   
   }
+  
   return (
     <div>
       <div className="signupParentDiv">
         <img width="200px" height="200px" src={Logo}></img>
-        <form onSubmit={handleSubmit}>
+        <Form onSubmit={handleSubmit(onSubmit)}>
+        <Form.Field>
           <label htmlFor="fname">Username</label>
           <br />
           <input
-            className="input"
+            className="input form-control"
             type="text"
-            value={username}
-            onChange={(e)=>setUsername(e.target.value)}
             id="fname"
             name="name"
-            defaultValue="John"
+            {...register("name",{ required: true, maxLength: 10 })}
+            
+
           />
+        
+          </Form.Field>
+          {errors.name && <p>Please check the User Name</p>}
           <br />
+          <Form.Field>
           <label htmlFor="fname">Email</label>
           <br />
           <input
-            className="input"
+            className="input form-control"
             type="email"
-            value={email}
-            onChange={(e)=>setEmail(e.target.value)}
             id="fname"
             name="email"
-            defaultValue="John"
+            {...register("email",{ required: true, maxLength: 30 })}
+
           />
+          </Form.Field>
+          {errors.email && <p>Email must be valid</p>}
+
           <br />
+          <Form.Field>
+
           <label htmlFor="lname">Phone</label>
           <br />
           <input
-            className="input"
+            className="input form-control"
             type="number"
-            value={phone}
-            onChange={(e)=>setPhone(e.target.value)}
             id="lname"
             name="phone"
-            defaultValue="Doe"
+            {...register("phone",{ required: true, maxLength: 10 })}
+
           />
+                    </Form.Field>
+
           <br />
+          <Form.Field>
+          {errors.phone && <p>Number must be a valid number</p>}
+
+
           <label htmlFor="lname">Password</label>
           <br />
           <input
-            className="input"
+            className="input form-control"
             type="password"
-            value={password}
-            onChange={(e)=>setPassword(e.target.value)}
             id="lname"
             name="password"
-            defaultValue="Doe"
+            {...register("passWord",{ required: true, maxLength: 10 })}
+
           />
+                    </Form.Field>
+                    {errors.name && <p>Pass must unsist of 4 letters</p>}
+
+
           <br />
           <br />
           <button>Signup</button>
-        </form>
+        </Form>
         <Link to='/login' >
          <p style={{color:'black'}}>Login</p>
         </Link>
